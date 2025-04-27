@@ -36,10 +36,11 @@ class Cnn_v0(nn.Module):
             nn.MaxPool2d(kernel_size=2,
                          stride=2)
         )
+        # fully connected layers
         self.classifier = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(in_features=0, # pass
-                      out_features=output_shape)
+            nn.Linear(in_features=10, # we need to know the shape of the flatten layer and that would be (b, n) where b is the batch size, we need to know n
+                      out_features=output_shape) # the output shape would be the total classses that we're predicting
         )
     
     def forward(self, x: torch.Tensor) -> torch.Tensor:
