@@ -5,6 +5,7 @@ import random
 from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
+from typing import List
 
 def get_random_image(image_path: Path):
     image_path_list = list(image_path.rglob("*.jpeg"))
@@ -36,3 +37,32 @@ def plot_transformed_image(image_path: Path, transform, n=3, seed=42):
             ax[1].axis("off")
 
             fig.suptitle(f"Class : {image_path.parent.stem}", fontsize=16)
+
+def plot_eval_curves(results: dict[str, List[float]]):
+    train_loss = results["train_loss"]
+    val_loss = results["val_loss"]
+    
+    train_acc = results["train_acc"]
+    val_acc = results["val_acc"]
+    
+    epochs = range(len(train_loss))
+
+    plt.figure(figsize=(15, 7))
+
+    # Plot train vs val loss
+    plt.subplot(1, 2, 1)
+    plt.plot(epochs, train_loss, label="train_loss")
+    plt.plot(epochs, val_loss, label="val_loss")
+    plt.title("Loss")
+    plt.xlabel("Epochs")
+    plt.legend()
+
+    # Plot train vs val acc
+    plt.subplot(1, 2, 2)
+    plt.plot(epochs, train_acc, label="train_accuracy")
+    plt.plot(epochs, val_acc, label="val_accuracy")
+    plt.title("Accuracy")
+    plt.xlabel("Epochs")
+    plt.legend()
+
+    plt.tight_layout()

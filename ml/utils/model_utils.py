@@ -2,6 +2,7 @@ from torch.utils.data import DataLoader
 import torch
 import torch.nn as nn
 from tqdm.auto import tqdm
+from classes.helpers import EarlyStopping
 
 def train_step(dataloader: DataLoader, optimizer: torch.optim.Optimizer, loss_fn: torch.nn.Module, model: nn.Module, device: str = "cuda"):
     train_loss, train_acc = 0, 0
@@ -75,7 +76,7 @@ def valid_step(model: nn.Module, loss_fn: torch.nn.Module, dataloader: DataLoade
             val_loss += loss.item()
             
             val_pred = torch.argmax(val_pred_logits, dim=1)
-            val_acc += (val_pred == y).sum().item / len(val_pred)
+            val_acc += ((val_pred == y).sum().item() / len(val_pred))
 
     val_loss = val_loss / len(dataloader)
     val_acc = val_acc / len(dataloader)
@@ -87,8 +88,8 @@ def train(model: nn.Module,
           loss_fn: torch.nn.Module,
           train_dataloader: DataLoader,
           validation_dataloader: DataLoader,
-          test_dataloader: DataLoader,
           n_epochs: int,
+          early_stopping: EarlyStopping, 
           device: str = "cuda"):
     
     results = {
@@ -96,8 +97,6 @@ def train(model: nn.Module,
         "train_acc": [],
         "val_loss": [],
         "val_acc": [],
-        "test_loss": [],
-        "test_acc": [],
     }
 
     for epoch in tqdm(range(n_epochs)):
@@ -108,16 +107,18 @@ def train(model: nn.Module,
         val_loss, val_acc = valid_step(dataloader=validation_dataloader,
                                         loss_fn=loss_fn,
                                         model=model)
-        test_loss, test_acc = test_step(dataloader=test_dataloader,
-                                        loss_fn=loss_fn,
-                                        model=model)
         
-        print(f"EPOCH : {epoch + 1}\nTrain Loss : {train_loss} | Train Acc : {train_acc}\nValidation Loss : {val_loss} | Validation Acc : {val_acc}\nTest Loss : {test_loss} | Test Acc : {test_acc}\n")
+        print(f"EPOCH : {epoch + 1}\nTrain Loss : {train_loss} | Train Acc : {train_acc}\nValidation Loss : {val_loss} | Validation Acc : {val_acc}")
         results['train_loss'].append(train_loss)
         results['train_acc'].append(train_acc)
         results['val_loss'].append(val_loss)
         results['val_acc'].append(val_acc)
-        results['test_loss'].append(test_loss)
-        results['test_acc'].append(test_acc)
+
+        # Check early stopping condition
+        early_stopping.check_early_stop(val_loss)
+        
+        if early_stopping.stop_training:
+            print(f"Early stopping at epoch {epoch}")
+            break
 
     return results
