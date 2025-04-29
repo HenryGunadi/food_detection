@@ -89,7 +89,7 @@ def train(model: nn.Module,
           train_dataloader: DataLoader,
           validation_dataloader: DataLoader,
           n_epochs: int,
-          early_stopping: EarlyStopping, 
+          early_stopping: EarlyStopping = None, 
           device: str = "cuda"):
     
     results = {
@@ -113,12 +113,13 @@ def train(model: nn.Module,
         results['train_acc'].append(train_acc)
         results['val_loss'].append(val_loss)
         results['val_acc'].append(val_acc)
-
-        # Check early stopping condition
-        early_stopping.check_early_stop(val_loss)
         
-        if early_stopping.stop_training:
-            print(f"Early stopping at epoch {epoch}")
-            break
+        if early_stopping is not None:
+            # Check early stopping condition
+            early_stopping.check_early_stop(val_loss)
+            
+            if early_stopping.stop_training:
+                print(f"Early stopping at epoch {epoch}")
+                break
 
     return results

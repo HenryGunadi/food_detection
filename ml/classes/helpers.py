@@ -17,3 +17,4 @@ class EarlyStopping():
                 self.stop_training = True
                 if self.verbose:
                     print("Stopping early as no improvement has been observed")
+                    print("Best Loss", self.best_loss)
