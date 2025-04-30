@@ -89,7 +89,8 @@ def train(model: nn.Module,
           train_dataloader: DataLoader,
           validation_dataloader: DataLoader,
           n_epochs: int,
-          early_stopping: EarlyStopping = None, 
+          scheduler: torch.optim,
+          early_stopping: EarlyStopping = None,
           device: str = "cuda"):
     
     results = {
@@ -121,5 +122,7 @@ def train(model: nn.Module,
             if early_stopping.stop_training:
                 print(f"Early stopping at epoch {epoch}")
                 break
+
+        scheduler.step(val_loss)
 
     return results
