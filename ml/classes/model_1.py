@@ -74,27 +74,27 @@ class Cnn_v1(nn.Module):
                       padding=1),
             nn.BatchNorm2d(hidden_units[3]),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2,
-                         stride=2)
-        )
-        self.conv_block_5 = nn.Sequential(
-            nn.Conv2d(in_channels=hidden_units[3],
-                      out_channels=hidden_units[4],
-                      kernel_size=3,
-                      stride=1,
-                      padding=1),
-            nn.BatchNorm2d(hidden_units[4]),
-            nn.ReLU(),
-            nn.Conv2d(in_channels=hidden_units[4],
-                      out_channels=hidden_units[4],
-                      kernel_size=3,
-                      stride=1,
-                      padding=1),
-            nn.BatchNorm2d(hidden_units[4]),
-            nn.ReLU(),
             nn.AvgPool2d(kernel_size=2,
                          stride=2)
         )
+        # self.conv_block_5 = nn.Sequential(
+        #     nn.Conv2d(in_channels=hidden_units[3],
+        #               out_channels=hidden_units[4],
+        #               kernel_size=3,
+        #               stride=1,
+        #               padding=1),
+        #     nn.BatchNorm2d(hidden_units[4]),
+        #     nn.ReLU(),
+        #     nn.Conv2d(in_channels=hidden_units[4],
+        #               out_channels=hidden_units[4],
+        #               kernel_size=3,
+        #               stride=1,
+        #               padding=1),
+        #     nn.BatchNorm2d(hidden_units[4]),
+        #     nn.ReLU(),
+        #     nn.AvgPool2d(kernel_size=2,
+        #                  stride=2)
+        # )
         # fully connected layers
         self.classifier = nn.Sequential(
             nn.Flatten(),
@@ -105,11 +105,8 @@ class Cnn_v1(nn.Module):
                       out_features=32),
             nn.ReLU(),
             nn.Linear(in_features=32,
-                      out_features=32),
-            nn.ReLU(),
-            nn.Linear(in_features=32,
                       out_features=output_shape),
         )
     
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.classifier(self.conv_block_5(self.conv_block_4(self.conv_block_3(self.conv_block_2(self.conv_block_1(x))))))
+        return self.classifier(self.conv_block_4(self.conv_block_3(self.conv_block_2(self.conv_block_1(x)))))
