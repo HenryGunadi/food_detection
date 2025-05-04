@@ -6,6 +6,26 @@ from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import List
+from collections import defaultdict
+from torch.utils.data import Subset
+
+from torch.utils.data import Subset
+from collections import defaultdict
+
+def get_first_n_per_class(dataset, n):
+    class_indices = defaultdict(list)
+    
+    for idx, (image, label) in enumerate(dataset):
+        class_indices[label].append(idx)
+    
+    selected_indices = []
+    
+    for class_idx, indices in class_indices.items():
+        selected_indices.extend(indices[:n])
+
+    return Subset(dataset, selected_indices)
+
+
 
 def get_random_image(image_path: Path):
     image_path_list = list(image_path.rglob("*.jpeg"))
@@ -66,3 +86,4 @@ def plot_eval_curves(results: dict[str, List[float]]):
     plt.legend()
 
     plt.tight_layout()
+

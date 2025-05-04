@@ -3,6 +3,8 @@ import torch
 import torch.nn as nn
 from tqdm.auto import tqdm
 from classes.helpers import EarlyStopping
+from pathlib import Path
+import os
 
 def train_step(dataloader: DataLoader, optimizer: torch.optim.Optimizer, loss_fn: torch.nn.Module, model: nn.Module, device: str = "cuda"):
     train_loss, train_acc = 0, 0
@@ -89,7 +91,7 @@ def train(model: nn.Module,
           train_dataloader: DataLoader,
           validation_dataloader: DataLoader,
           n_epochs: int,
-          scheduler: torch.optim,
+          scheduler: torch.optim = None,
           early_stopping: EarlyStopping = None,
           device: str = "cuda"):
     
@@ -104,10 +106,12 @@ def train(model: nn.Module,
         train_loss, train_acc = train_step(dataloader=train_dataloader,
                                         optimizer=optimizer,
                                         loss_fn=loss_fn,
-                                        model=model)
+                                        model=model,
+                                        device=device)
         val_loss, val_acc = valid_step(dataloader=validation_dataloader,
                                         loss_fn=loss_fn,
-                                        model=model)
+                                        model=model,
+                                        device=device)
         
         print(f"EPOCH : {epoch + 1}\nTrain Loss : {train_loss} | Train Acc : {train_acc}\nValidation Loss : {val_loss} | Validation Acc : {val_acc}")
         results['train_loss'].append(train_loss)
@@ -122,7 +126,8 @@ def train(model: nn.Module,
             if early_stopping.stop_training:
                 print(f"Early stopping at epoch {epoch}")
                 break
-
-        scheduler.step(val_loss)
+        
+        if scheduler is not None:
+            scheduler.step(val_loss)
 
     return results
