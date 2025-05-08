@@ -98,10 +98,10 @@ class Cnn_v1(nn.Module):
         # fully connected layers
         self.classifier = nn.Sequential(
             nn.Flatten(),
-            nn.LazyLinear(out_features=64),
+            nn.LazyLinear(out_features=128),
             nn.ReLU(),
-            nn.Dropout(p=0.5),
-            nn.Linear(in_features=64, out_features=64),
+            nn.Dropout(p=0.5), #best 0.2
+            nn.Linear(in_features=128, out_features=64),
             nn.ReLU(),
             nn.Linear(in_features=64,
                       out_features=output_shape),

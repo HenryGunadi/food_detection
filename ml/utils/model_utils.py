@@ -113,6 +113,8 @@ def train(model: nn.Module,
                                         model=model,
                                         device=device)
         
+        current_lr = optimizer.param_groups[0]["lr"]
+        print(f"Epoch {epoch+1} - Learning Rate: {current_lr}")
         print(f"EPOCH : {epoch + 1}\nTrain Loss : {train_loss} | Train Acc : {train_acc}\nValidation Loss : {val_loss} | Validation Acc : {val_acc}")
         results['train_loss'].append(train_loss)
         results['train_acc'].append(train_acc)
